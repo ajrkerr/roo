@@ -277,14 +277,16 @@ public
   end
 
 
-  # when a method like spreadsheet.a42 is called
-  # convert it to a call of spreadsheet.cell('a',42)
-  def method_missing(m, *args)
+  ##
+  # When a method like spreadsheet.a42 is called
+  # Convert it to a call of spreadsheet.cell('a',42)
+  def method_missing(method, *args)
     # #aa42 => #cell('aa',42)
     # #aa42('Sheet1')  => #cell('aa',42,'Sheet1')
-    if m =~ /^([a-z]+)(\d)$/
+    if method =~ /^([a-z]+)(\d)$/
       col = Roo::Base.letter_to_number($1)
       row = $2.to_i
+
       if args.empty?
         cell(row,col)
       else
@@ -295,17 +297,29 @@ public
     end
   end
 
+  def respond_to?(method, include_all= false)
+    # #aa42 => #cell('aa',42)
+    # #aa42('Sheet1')  => #cell('aa',42,'Sheet1')
+    if method =~ /^([a-z]+)(\d)$/
+      true
+    else
+      super
+    end
+  end
+
+  ##
   # access different worksheets by calling spreadsheet.sheet(1)
   # or spreadsheet.sheet('SHEETNAME')
-  def sheet(index,name=false)
+  def sheet(index, name=false)
     @default_sheet = String === index ? index : self.sheets[index]
     name ? [@default_sheet,self] : self
   end
 
-  # iterate through all worksheets of a document
+  ##
+  # Iterate through all worksheets of a document
   def each_with_pagename
     self.sheets.each do |s|
-      yield sheet(s,true)
+      yield sheet(s, true)
     end
   end
 
@@ -441,10 +455,10 @@ protected
     }
 
     if packed == :zip
-	    # lalala.ods.zip => lalala.ods
-	    # Here is NOT made ​​unzip, but only the name of the file 
+      # lalala.ods.zip => lalala.ods
+      # Here is NOT made ​​unzip, but only the name of the file 
       # Tested, if it is a compressed file.
-	    filename = File.basename(filename,File.extname(filename))
+      filename = File.basename(filename,File.extname(filename))
     end
 
     case ext

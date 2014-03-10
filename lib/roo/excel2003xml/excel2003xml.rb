@@ -17,7 +17,7 @@ class Roo::Excel2003XML < Roo::Base
     end
 
     make_tmpdir do |tmpdir|
-      filename = download_uri(filename, tmpdir) if uri?(filename)
+      filename = download_uri(filename) if uri?(filename)
       filename = unzip(filename, tmpdir) if packed == :zip
 
       file_type_check(filename,'.xml','an Excel 2003 XML', file_warning)
@@ -191,9 +191,9 @@ class Roo::Excel2003XML < Roo::Base
   # some content <text:s text:c="3"/>
   #++
   def read_cells(sheet=nil)
-    sheet ||= @default_sheet
-    validate_sheet!(sheet)
+    sheet = get_sheet(sheet)
     return if @cells_read[sheet]
+    
     sheet_found = false
     @doc.xpath("/ss:Workbook/ss:Worksheet[@ss:Name='#{sheet}']").each do |ws|
       sheet_found = true

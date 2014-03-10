@@ -31,9 +31,9 @@ class Roo::Excel < Roo::Base
     file_type_check(filename,'.xls','an Excel', file_warning, packed)
 
     make_tmpdir do |tmpdir|
-      filename = download_uri(filename, tmpdir)            if uri?(filename)
-      filename = open_from_stream(filename[7..-1], tmpdir) if filename[0,7] == "stream:"
-      filename = unzip(filename, tmpdir)                   if packed == :zip
+      filename = download_uri(filename)    if uri?(filename)
+      filename = open_from_stream(filename[7..-1]) if filename[0,7] == "stream:"
+      filename = unzip(filename, tmpdir)           if packed == :zip
 
       @filename = filename
       unless File.file?(@filename)
@@ -67,8 +67,7 @@ class Roo::Excel < Roo::Base
 
   # returns the content of a cell. The upper left corner is (1,1) or ('A',1)
   def cell(row,col,sheet=nil)
-    sheet ||= @default_sheet
-    validate_sheet!(sheet)
+    sheet = get_sheet(sheet)
 
     read_cells(sheet)
     raise "should be read" unless @cells_read[sheet]
@@ -252,8 +251,8 @@ class Roo::Excel < Roo::Base
 
   # read all cells in the selected sheet
   def read_cells(sheet=nil)
-    sheet ||= @default_sheet
-    validate_sheet!(sheet)
+    sheet = get_sheet(sheet)
+    
     return if @cells_read[sheet]
 
     worksheet = @workbook.worksheet(sheet_no(sheet))

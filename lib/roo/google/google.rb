@@ -66,8 +66,7 @@ class Roo::Google < Roo::Base
   # (1,1), (1,'A'), ('A',1), ('a',1) all refers to the
   # cell at the first line and first row.
   def cell(row, col, sheet=nil)
-    sheet ||= @default_sheet
-    validate_sheet!(sheet) #TODO: 2007-12-16
+    sheet = get_sheet(sheet) 
     read_cells(sheet)
     row,col = normalize(row,col)
     value = @cell[sheet]["#{row},#{col}"]
@@ -130,8 +129,7 @@ class Roo::Google < Roo::Base
   # sets the cell to the content of 'value'
   # a formula can be set in the form of '=SUM(...)'
   def set(row,col,value,sheet=nil)
-    sheet ||= @default_sheet
-    validate_sheet!(sheet)
+    sheet = get_sheet(sheet)
 
     sheet_no = sheets.index(sheet)+1
     row,col = normalize(row,col)
@@ -209,8 +207,7 @@ class Roo::Google < Roo::Base
 
   # read all cells in a sheet.
   def read_cells(sheet=nil)
-    sheet ||= @default_sheet
-    validate_sheet!(sheet)
+    sheet = get_sheet(sheet)
     return if @cells_read[sheet]
 
     sheet_no = sheets.index(sheet)
